@@ -1,0 +1,43 @@
+{
+	"name": "telnet-api",
+	"version": "1.0.0",
+	"description": "telnet-api",
+	"main": "app.js",
+	"author": {
+		"name": "Prav"
+	},
+	"dependencies": {
+		"body-parser": "*",
+		"cookie-parser": "*",
+		"cors": "*",
+		"errorhandler": "*",
+		"express": "*",
+		"express-session": "*",
+		"jsreport": "^1.8.2",
+		"jsreport-client": "^0.4.1",
+		"jsreport-core": "^1.4.0",
+		"jsreport-jsrender": "^1.0.2",
+		"lodash": "*",
+		"method-override": "*",
+		"mongoose": "*",
+		"morgan": "*",
+		"node-stringify": "*",
+		"q": "*",
+		"routeros-client": "*"
+	},
+	"devDependencies": {
+		"@types/body-parser": "*",
+		"@types/cookie-parser": "*",
+		"@types/cors": "*",
+		"@types/errorhandler": "*",
+		"@types/lodash": "*",
+		"@types/method-override": "*",
+		"@types/mongodb": "*",
+		"@types/mongoose": "*",
+		"@types/morgan": "*",
+		"bluebird": "*",
+		"nodemon": "*",
+		"tsc": "*",
+		"typescript": "*"
+	}
+}

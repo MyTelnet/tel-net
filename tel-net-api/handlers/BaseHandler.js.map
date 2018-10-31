@@ -1,0 +1,1 @@
+{"version":3,"file":"BaseHandler.js","sourceRoot":"","sources":["BaseHandler.ts"],"names":[],"mappings":";;AAAA,gDAAgD;AAEhD,MAAM,WAAW;IAChB,uBAAuB,CAAC,SAAc;QACrC,OAAO,CAAC,GAAG,CAAC,SAAS,CAAC,CAAC;IACxB,CAAC;IAED,cAAc;QACb,OAAO,OAAO,CAAC,cAAc,CAAC;IAC/B,CAAC;IAED,aAAa;QACZ,OAAO,OAAO,CAAC,aAAa,CAAC;IAC9B,CAAC;CACD;AAED,kBAAe,WAAW,CAAC"}

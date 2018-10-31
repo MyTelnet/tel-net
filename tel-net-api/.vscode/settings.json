@@ -1,0 +1,27 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+	    //"editor.fontFamily": "Calibri, 'Courier New', monospace",
+    "editor.fontSize": 16,
+	"window.zoomLevel": 0,
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"**/*.js.map": true,
+		"**/*.js": {
+			"when": "$(basename).ts"
+		},
+		"**/*.css": {
+			"when": "$(basename).scss"
+		},
+		"**/node_modules": true
+	},
+	"git.confirmSync": false,
+	"workbench.iconTheme": "material-icon-theme",
+	"files.autoSave": "off",
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"git.enableSmartCommit": true,
+	"editor.minimap.enabled": false
+}
