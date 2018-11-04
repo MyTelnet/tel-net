@@ -8,6 +8,7 @@ import Router from '../models/router/Router';
 var current: Router;
 class RouterController extends BaseController
 	implements IBaseController<Handler> {
+	
 	RouterController() {
 		current = new Router();
 	}
@@ -101,10 +102,7 @@ class RouterController extends BaseController
 		}
 	}
 
-	changeUserPassword(
-		request: express.Request,
-		response: express.Response
-	): void {
+	changeUserPassword(request: express.Request, response: express.Response): void {
 		var routerRequestObject: any = <any>request.body;
 		try {
 			if (current) {
