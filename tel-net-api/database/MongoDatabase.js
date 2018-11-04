@@ -20,7 +20,7 @@ exports.default = (mongoose) => {
     });
     process.on('SIGINT', gracefulExit).on('SIGTERM', gracefulExit);
     mongoose
-        .connect(configuration['ConnectionString'], { useMongoClient: true })
+        .connect(configuration['ConnectionString'])
         .then(() => { })
         .catch((error) => {
         console.error('App starting error:', error.stack);

@@ -37,8 +37,8 @@ export default (mongoose: any) => {
 
 	mongoose
 		.connect(
-			configuration['ConnectionString'],
-			{ useMongoClient: true }
+			configuration['ConnectionString']
+		
 		)
 		.then(() => {})
 		.catch((error: any) => {

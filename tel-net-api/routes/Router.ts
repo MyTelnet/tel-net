@@ -11,9 +11,7 @@ class Router {
 
 	get Routes() {
 		var controller = this.routerController;
-		router.get("/getbyid/:id", controller.getById);
-		router.get("/getlist", controller.getList);
-		router.post("/create", controller.create);
+		router.get("/ping", controller.ping);
 		console.log("Router Routes Created!");
 		return router;
 	}
