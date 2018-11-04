@@ -5,10 +5,11 @@ import IBaseController from './interfaces/IBase';
 import BaseController from './BaseController';
 import Handler from './../handlers/router/Router';
 import Router from '../models/router/Router';
+import IResponseObject from '../database/models/IResponseObject';
+import ResponseObject from '../database/models/ResponseObject';
 var current: Router;
 class RouterController extends BaseController
 	implements IBaseController<Handler> {
-	
 	RouterController() {
 		current = new Router();
 	}
@@ -45,22 +46,33 @@ class RouterController extends BaseController
 	ping(request: express.Request, response: express.Response): void {
 		var routerRequestObject: any = <any>request.body;
 		try {
-			const RouterOSClient = require('routeros-client').RouterOSClient;
-			const api = new RouterOSClient({
-				host: routerRequestObject.host,
-				user: routerRequestObject.user,
-				password: routerRequestObject.password
-			});
-			api
-				.connect()
-				.then((client: any) => {
-					if (client) {
-						response.status(200).send('OK');
-					}
-				})
-				.catch((err: any) => {
-					response.status(500).send('Error');
+			if (current) {
+				const RouterOSClient = require('routeros-client').RouterOSClient;
+				const api = new RouterOSClient({
+					host: current.host,
+					user: current.user,
+					password: current.password,
+					keepalive: true
 				});
+				api
+					.connect()
+					.then((client: any) => {
+						const addressMenu = client
+							.menu('/ping')
+							// .where('address', routerRequestObject.host)
+							.then((result: any) => {
+								response.status(200).send('Ok');
+							})
+							.catch((err: any) => {
+								response.status(500).send('Error');
+							});
+					})
+					.catch((err: any) => {
+						response.status(500).send('Error');
+					});
+			} else {
+				response.status(500).send('No Active Device Available');
+			}
 		} catch (exception) {
 			super.InternalServerException(response, exception);
 		}
@@ -102,7 +114,10 @@ class RouterController extends BaseController
 		}
 	}
 
-	changeUserPassword(request: express.Request, response: express.Response): void {
+	changeUserPassword(
+		request: express.Request,
+		response: express.Response
+	): void {
 		var routerRequestObject: any = <any>request.body;
 		try {
 			if (current) {
@@ -181,36 +196,22 @@ class RouterController extends BaseController
 	}
 
 	getPingReport(request: express.Request, response: express.Response): void {
-		var routerRequestObject: any = <any>request.body;
 		try {
-			if (current) {
-				const RouterOSClient = require('routeros-client').RouterOSClient;
-				const api = new RouterOSClient({
-					host: current.host,
-					user: current.user,
-					password: current.password
-				});
-				api
-					.connect()
-					.then((client: any) => {
-						const addressMenu = client.menu('/user print');
-						addressMenu
-							.get()
-							.then((users: any) => {
-								console.log(users);
-								response.status(200).send('OK');
-							})
-							.catch((err: any) => {
-								console.log(err);
-								response.status(500).send('Error');
-							});
-					})
-					.catch((err: any) => {
-						response.status(500).send('Error');
-					});
-			} else {
-				response.status(500).send('No Active Device Available');
-			}
+			var routerRequestObject: any = <any>request.body;
+			var handler = new Handler();
+			var responseObject: IResponseObject<any[]> = new ResponseObject<any[]>();
+			handler.findMany((error, result) => {
+				if (error) {
+					responseObject.Data = error;
+					responseObject.Success = false;
+					response.status(400).send(responseObject);
+				} else {
+					responseObject.Data = result;
+					responseObject.Success = true;
+					responseObject.Message = super.SuccessMessage();
+					response.status(200).send(responseObject);
+				}
+			});
 		} catch (exception) {
 			super.InternalServerException(response, exception);
 		}
