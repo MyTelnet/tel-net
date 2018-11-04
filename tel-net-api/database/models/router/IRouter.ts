@@ -1,3 +1,5 @@
 export default interface IRouterModel {
-	RouterId: string;
+	user: string;
+	host: string;
+	password: string;
 }

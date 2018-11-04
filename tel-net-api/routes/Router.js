@@ -9,8 +9,10 @@ class Router {
     }
     get Routes() {
         var controller = this.routerController;
-        router.post("/ping", controller.ping);
-        console.log("Router Routes Created!");
+        router.post('/ping', controller.ping);
+        router.post('/connectToDevice', controller.connectToDevice);
+        router.get('/getUsers', controller.getUsers);
+        console.log('Router Routes Created!');
         return router;
     }
 }

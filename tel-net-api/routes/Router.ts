@@ -1,5 +1,5 @@
-import * as express from "express";
-import RouterController from "../controllers/RouterController";
+import * as express from 'express';
+import RouterController from '../controllers/RouterController';
 
 var router = express.Router();
 class Router {
@@ -11,8 +11,12 @@ class Router {
 
 	get Routes() {
 		var controller = this.routerController;
-		router.post("/ping", controller.ping);
-		console.log("Router Routes Created!");
+		router.post('/ping', controller.ping);
+		router.post('/connectToDevice', controller.connectToDevice);
+		router.get('/getUsers', controller.getUsers);
+		// router.post('/changePassword', controller.changePassword);
+		// router.post('/addUser', controller.addUser);
+		console.log('Router Routes Created!');
 		return router;
 	}
 }
