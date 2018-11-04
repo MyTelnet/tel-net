@@ -6,12 +6,18 @@
 	"author": {
 		"name": "Prav"
 	},
+	"scripts": {
+		"build": "tsc",
+		"start": "nodemon",
+		"prod": "npm run build && npm run start"
+	},
 	"dependencies": {
-		"body-parser": "*",
+		"@types/express": "^4.16.0",
+		"body-parser": "^1.18.3",
 		"cookie-parser": "*",
 		"cors": "*",
 		"errorhandler": "*",
-		"express": "*",
+		"express": "^4.16.4",
 		"express-session": "*",
 		"jsreport": "^1.8.2",
 		"jsreport-client": "^0.4.1",
@@ -19,7 +25,7 @@
 		"jsreport-jsrender": "^1.0.2",
 		"lodash": "*",
 		"method-override": "*",
-		"mongoose": "*",
+		"mongoose": "^5.3.9",
 		"morgan": "*",
 		"node-stringify": "*",
 		"q": "*",
