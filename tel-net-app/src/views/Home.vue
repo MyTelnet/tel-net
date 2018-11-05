@@ -1,6 +1,27 @@
 <template>
   <div class="home">
-    <img class="branding" src="../assets/brand.png"/>
+     <v-flex sm12 md4 offset-md4>
+        <v-card>
+          <div class="card-header-block" >
+            <img src="@/assets/brand.png" class="brand"/>
+               <h3 class="headline mb-0 text-xs-center">Mikrotik Connection Demo</h3>
+          </div>
+          <div class="form-container">
+            <v-form v-model="valid">
+             <v-text-field v-model="host" :rules="hostRules" label="Host" required></v-text-field>
+             <v-text-field v-model="username" :rules="usernameRules" label="Username" required></v-text-field>
+            <v-text-field v-model="password" :rules="passwordRules" label="Password" required></v-text-field>
+        </v-form>
+          </div>
+          <v-card-actions>  
+             <v-flex xs12 sm4 offset-sm4>
+            <v-btn block color="info" class="text-xs-center">Connect</v-btn><br/>
+             </v-flex>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+      <br/>
+      <p class="text-xs-center">Prav &copy; 2018</p>
   </div>
 </template>
 
@@ -10,68 +31,47 @@ import { timer, Observable, Subscription } from 'rxjs';
 import router from '../router';
 @Component({
   name: 'Home',
-  created: () => {
-         router.push({ name: 'test' });
-  },
-  destroyed: () => {},
+  created: () => {},
   methods: {
     navigate() {
       router.push({ name: 'test' });
     }
-  }
+  },
+  data: () => ({
+    valid: false,
+    host: '',
+    hostRules: [(v: any) => !!v || 'Host is required'],
+    username: '',
+    usernameRules: [(v: any) => !!v || 'Username is required'],
+    password: '',
+    passwordRules: [(v: any) => !!v || 'Password is required']
+  })
 })
 export default class Home extends Vue {}
 </script>
-
 <style lang="scss">
-body {
-  background: #3f966c;
-  text-align: center;
-  color: #ffffff;
-  font-family: open-sans;
-}
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p {
-  color: #fff;
-  font-weight: 100;
-}
+@import '../styles/animations';
 .home {
-  margin-top: 40vh;
-}
-
-.branding {
-  animation: pulsate 2s infinite;
-  width: 150px;
-}
-
-@keyframes pulsate {
-  0% {
-    -webkit-transform: scale(0.5);
-    -moz-transform: scale(0.5);
-    -o-transform: scale(0.5);
-    -ms-transform: scale(0.5);
-    transform: scale(0.5);
+  margin-top: 25vh;
+  padding: 32px;
+  @include animate-css(slideInUp);
+  .card-header-block {
+    padding: 16px;
+    position: relative;
+    background: #236bb2;
+    min-height: 180px;
   }
-
-  50% {
-    -webkit-transform: scale(1);
-    -moz-transform: scale(1);
-    -o-transform: scale(1);
-    -ms-transform: scale(1);
-    transform: scale(1);
+  .form-container {
+    padding: 16px 32px;
   }
-
-  100% {
-    -webkit-transform: scale(0.5);
-    -moz-transform: scale(0.5);
-    -o-transform: scale(0.5);
-    -ms-transform: scale(0.5);
-    transform: scale(0.5);
+  .brand {
+    display: block;
+    width: 60px;
+    margin: auto;
+    margin-top: 5%;
+  }
+  p {
+    font-weight: lighter;
   }
 }
 </style>
