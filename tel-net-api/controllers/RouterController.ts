@@ -107,28 +107,50 @@ class RouterController extends BaseController
 				const api = new RouterOSClient({
 					host: current.host,
 					user: current.user,
-					password: current.password
+					password: current.password,
+					keepalive: true
 				});
+				var responseObject: IResponseObject<any> = new ResponseObject<any>();
 				api
 					.connect()
 					.then((client: any) => {
 						const addressMenu = client.menu('/user print');
 						addressMenu
 							.get()
-							.then((users: any) => {
-								console.log(users);
-								response.status(200).send('OK');
+							.then((result: any) => {
+								let users: any[] = [];
+								result.forEach((element: any) => {
+									let user = {
+										name: element.name,
+										group: element.name,
+										lastLoggedIn: element.lastLoggedIn,
+										disabled: element.disabled
+									};
+									users.push(user);
+								});
+								responseObject.Data = users;
+								responseObject.Message = 'Device Users Retrieved Successfully';
+								responseObject.Success = true;
+								response.status(200).send(responseObject);
 							})
 							.catch((err: any) => {
-								console.log(err);
-								response.status(500).send('Error');
+								responseObject.Data = err;
+								responseObject.Message = 'Error Retrieving Users';
+								responseObject.Success = false;
+								response.status(500).send(responseObject);
 							});
 					})
 					.catch((err: any) => {
-						response.status(500).send('Error');
+						responseObject.Data = err;
+						responseObject.Message = 'Error Retrieving Users';
+						responseObject.Success = false;
+						response.status(500).send(responseObject);
 					});
 			} else {
-				response.status(500).send('No Active Device Available');
+				responseObject.Data = null;
+				responseObject.Message = 'No Active Device Available';
+				responseObject.Success = false;
+				response.status(500).send(responseObject);
 			}
 		} catch (exception) {
 			super.InternalServerException(response, exception);
@@ -139,7 +161,7 @@ class RouterController extends BaseController
 		request: express.Request,
 		response: express.Response
 	): void {
-		var routerRequestObject: any = <any>request.body;
+		var routerRequestObject: any = <any>request.body.data;
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -159,7 +181,6 @@ class RouterController extends BaseController
 							.close()
 							.then(() => {
 								return api.connect();
-								response.status(200).send('OK');
 							})
 							.then((client2: any) => {
 								return api.close();

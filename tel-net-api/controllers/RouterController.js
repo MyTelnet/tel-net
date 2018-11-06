@@ -104,17 +104,31 @@ class RouterController extends BaseController_1.default {
                 const api = new RouterOSClient({
                     host: current.host,
                     user: current.user,
-                    password: current.password
+                    password: current.password,
+                    keepalive: true
                 });
+                var responseObject = new ResponseObject_1.default();
                 api
                     .connect()
                     .then((client) => {
                     const addressMenu = client.menu('/user print');
                     addressMenu
                         .get()
-                        .then((users) => {
-                        console.log(users);
-                        response.status(200).send('OK');
+                        .then((result) => {
+                        let users = [];
+                        result.forEach((element) => {
+                            let user = {
+                                name: element.name,
+                                group: element.name,
+                                lastLoggedIn: element.lastLoggedIn,
+                                disabled: element.disabled
+                            };
+                            users.push(user);
+                        });
+                        responseObject.Data = users;
+                        responseObject.Message = 'Device Pongged Successfully';
+                        responseObject.Success = true;
+                        response.status(200).send(responseObject);
                     })
                         .catch((err) => {
                         console.log(err);
