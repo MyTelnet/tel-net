@@ -95,9 +95,11 @@
   html {
     overflow: hidden;
   }
-  .errorAlert{
+  
+  .errorAlert {
     @include animate-css(slideInDown);
   }
+  
   .home {
     margin-top: 10vh;
     padding: 32px;
