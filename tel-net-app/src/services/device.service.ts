@@ -12,6 +12,10 @@ class DeviceService {
     return this.postData('router/ping', data);
   }
 
+  public getUsers() {
+    return this.getData('router/getUsers');
+  }
+
   private postData(url: string, data: any): any {
     return axios.post(apiUrl + url, {
       headers: {
@@ -21,7 +25,7 @@ class DeviceService {
     });
   }
 
-  private getData(url: string, data: any): any {
+  private getData(url: string): any {
     return axios.get(apiUrl + url, {
       headers: {
         'Content-Type': 'application/json',

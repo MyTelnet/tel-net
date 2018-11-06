@@ -7,7 +7,7 @@ class BaseController {
     }
     InternalServerException(response, exception) {
         console.log(exception);
-        response.status(500).send('Something went Wrong. We are working on it.');
+        response.status(500).send('Something went Wrong');
     }
     SuccessMessage() {
         return Message.SuccessMessage;

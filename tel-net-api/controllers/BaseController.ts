@@ -8,7 +8,7 @@ class BaseController {
 
 	InternalServerException(response: express.Response, exception: any) {
 		console.log(exception);
-		response.status(500).send('Something went Wrong. We are working on it.');
+		response.status(500).send('Something went Wrong');
 	}
 
 	SuccessMessage() {

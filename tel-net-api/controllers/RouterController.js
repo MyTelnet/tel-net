@@ -126,21 +126,29 @@ class RouterController extends BaseController_1.default {
                             users.push(user);
                         });
                         responseObject.Data = users;
-                        responseObject.Message = 'Device Pongged Successfully';
+                        responseObject.Message = 'Device Users Retrieved Successfully';
                         responseObject.Success = true;
                         response.status(200).send(responseObject);
                     })
                         .catch((err) => {
-                        console.log(err);
-                        response.status(500).send('Error');
+                        responseObject.Data = err;
+                        responseObject.Message = 'Error Retrieving Users';
+                        responseObject.Success = false;
+                        response.status(500).send(responseObject);
                     });
                 })
                     .catch((err) => {
-                    response.status(500).send('Error');
+                    responseObject.Data = err;
+                    responseObject.Message = 'Error Retrieving Users';
+                    responseObject.Success = false;
+                    response.status(500).send(responseObject);
                 });
             }
             else {
-                response.status(500).send('No Active Device Available');
+                responseObject.Data = null;
+                responseObject.Message = 'No Active Device Available';
+                responseObject.Success = false;
+                response.status(500).send(responseObject);
             }
         }
         catch (exception) {
@@ -148,7 +156,7 @@ class RouterController extends BaseController_1.default {
         }
     }
     changeUserPassword(request, response) {
-        var routerRequestObject = request.body;
+        var routerRequestObject = request.body.data;
         try {
             if (current) {
                 const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -168,7 +176,6 @@ class RouterController extends BaseController_1.default {
                         .close()
                         .then(() => {
                         return api.connect();
-                        response.status(200).send('OK');
                     })
                         .then((client2) => {
                         return api.close();

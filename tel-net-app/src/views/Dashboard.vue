@@ -33,7 +33,7 @@
       <v-toolbar-title>Mikrotik Demo </v-toolbar-title>
     </v-toolbar>
     <v-content>
-      <v-container fluid fill-height>
+      <v-container fluid >
         <v-layout>
           <v-flex>
             <v-card>
@@ -64,34 +64,24 @@
               <div class="card-header-block">
                 <h3 class="headline mb-0 text-xs-center">Current Users</h3>
               </div>
-              <v-form ref="form" v-model="valid" lazy-validation>
-                <div class="form-container">
-                  <v-text-field v-model="host" :rules="hostRules" label="Host" required></v-text-field>
-                  <v-text-field v-model="username" :rules="usernameRules" label="Username" required></v-text-field>
-                  <v-text-field v-model="password" :rules="passwordRules" label="Password" required></v-text-field>
-                </div>
-                <v-card-actions>
-                  <v-flex xs12 sm4 offset-sm4>
-                    <v-btn block color="info" class="text-xs-center" :disabled="!valid" @click="submit">Connect</v-btn><br/>
-                  </v-flex>
-                </v-card-actions>
-              </v-form>
+              <li v-if="!users" v-for="value in users" v-bind:key="value">
+    {{ value }}
+  </li>
             </v-card>
           </v-flex>
           <v-flex>
             <v-card>
               <div class="card-header-block">
-                <h3 class="headline mb-0 text-xs-center">Ping Device</h3>
+                <h3 class="headline mb-0 text-xs-center">Update User </h3>
               </div>
               <v-form ref="form" v-model="valid" lazy-validation>
                 <div class="form-container">
-                  <v-text-field v-model="host" :rules="hostRules" label="Host" required></v-text-field>
                   <v-text-field v-model="username" :rules="usernameRules" label="Username" required></v-text-field>
                   <v-text-field v-model="password" :rules="passwordRules" label="Password" required></v-text-field>
                 </div>
                 <v-card-actions>
                   <v-flex xs12 sm4 offset-sm4>
-                    <v-btn block color="info" class="text-xs-center" :disabled="!valid" @click="submit">Connect</v-btn><br/>
+                    <v-btn block color="info" class="text-xs-center" :disabled="!valid" @click="submit">Update</v-btn><br/>
                   </v-flex>
                 </v-card-actions>
               </v-form>
@@ -107,12 +97,25 @@ import { Component, Emit, Prop, Watch, Vue } from 'vue-property-decorator';
 import { timer, Observable, Subscription } from 'rxjs';
 import { deviceService } from '../services/device.service';
 @Component({
+  mounted: () => {
+    deviceService
+      .getUsers()
+      .then((result: any) => {
+        if (result.data.Success) {
+          this.users = result.data.Data;
+          alert(result.data.Data)
+        } else {
+        }
+      })
+      .catch((error: any) => {});
+  },
   data: () => ({
     drawer: true,
     validPing: true,
     pingAddress: '',
     hasPingError: false,
     pingError: '',
+    users: null,
     pingAddressRules: [(v: any) => !!v || 'Address is required']
   }),
   props: {
@@ -143,7 +146,8 @@ import { deviceService } from '../services/device.service';
       this.hasPingError = false;
       this.pingError = '';
       this.pingAddress = '';
-    }
+    },
+
   }
 })
 export default class Dashboard extends Vue {}

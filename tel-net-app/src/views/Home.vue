@@ -29,99 +29,85 @@
 </template>
 
 <script lang="ts">
-  import {
-    Component,
-    Emit,
-    Prop,
-    Watch,
-    Vue,
-  } from 'vue-property-decorator';
-  import {
-    timer,
-    Observable,
-    Subscription,
-  } from 'rxjs';
-  import {
-    DeviceModel,
-  } from '../models/device.model';
-  import {
-    deviceService,
-  } from '../services/device.service';
-  import router from '../router';
-  import axios from 'axios';
-  @Component({
-    data: () => ({
-      valid: true,
-      hasError: false,
-      errorMessage: '',
-      host: '',
-      hostRules: [(v: any) => !!v || 'Host is required'],
-      username: '',
-      usernameRules: [(v: any) => !!v || 'Username is required'],
-      password: '',
-    }),
-    methods: {
-      submit() {
-        if ((this.$refs.form as any).validate()) {
-          const ctx = {
-            host: this.host,
-            user: this.username,
-            password: this.password
-          };
-          deviceService
-            .connect(ctx)
-            .then((result: any) => {
-              if (result.data.Success) {
-                router.push('dashboard');
-              } else {
-                this.hasError = result.data.Success;
-                this.errorMessage = result.data.Message;
-              }
-            })
-            .catch((error: any) => {
-              this.hasError = true;
-              this.errorMessage =
-                'Hmmm... Seems To Be A Server Related Error. Please Try Again';
-            });
-        }
+import { Component, Emit, Prop, Watch, Vue } from 'vue-property-decorator';
+import { timer, Observable, Subscription } from 'rxjs';
+import { DeviceModel } from '../models/device.model';
+import { deviceService } from '../services/device.service';
+import router from '../router';
+import axios from 'axios';
+@Component({
+  data: () => ({
+    valid: true,
+    hasError: false,
+    errorMessage: '',
+    host: '',
+    hostRules: [(v: any) => !!v || 'Host is required'],
+    username: '',
+    usernameRules: [(v: any) => !!v || 'Username is required'],
+    password: ''
+  }),
+  methods: {
+    submit() {
+      if ((this.$refs.form as any).validate()) {
+        const ctx = {
+          host: this.host,
+          user: this.username,
+          password: this.password
+        };
+        deviceService
+          .connect(ctx)
+          .then((result: any) => {
+            if (result.data.Success) {
+              router.push('dashboard');
+            } else {
+              this.hasError = result.data.Success;
+              this.errorMessage = result.data.Message;
+            }
+          })
+          .catch((error: any) => {
+            this.hasError = true;
+            this.errorMessage =
+              'Hmmm... Seems To Be A Server Related Error. Please Try Again';
+          });
       }
     }
-  })
-  export default class Home extends Vue {}
+  }
+})
+export default class Home extends Vue {}
 </script>
 
 <style lang="scss">
-  @import '../styles/animations';
-  html {
-    overflow: hidden;
+@import '../styles/animations';
+html {
+  overflow: hidden;
+}
+
+.errorAlert {
+  @include animate-css(slideInDown);
+}
+
+.home {
+  margin-top: 10vh;
+  padding: 32px;
+  overflow: hidden;
+  @include animate-css(slideInUp);
+  .card-header-block {
+    padding: 16px;
+    position: relative;
+    background: #236bb2;
+    min-height: 180px;
   }
-  
-  .errorAlert {
-    @include animate-css(slideInDown);
+  .form-container {
+    padding: 16px 32px;
   }
-  
-  .home {
-    margin-top: 10vh;
-    padding: 32px;
-    overflow: hidden;
-    @include animate-css(slideInUp);
-    .card-header-block {
-      padding: 16px;
-      position: relative;
-      background: #236bb2;
-      min-height: 180px;
-    }
-    .form-container {
-      padding: 16px 32px;
-    }
-    .brand {
-      display: block;
-      width: 60px;
-      margin: auto;
-      margin-top: 5%;
-    }
-    p {
-      font-weight: lighter;
-    }
+  .brand {
+    display: block;
+    width: 60px;
+    margin: auto;
+    margin-top: 5%;
   }
+  p {
+    font-weight: lighter;
+  }
+}
 </style>
