@@ -48,7 +48,7 @@ class RouterController extends BaseController
 					responseObject.Data = err;
 					responseObject.Message = 'An Error Occured';
 					responseObject.Success = false;
-					response.status(400).send(responseObject);
+					response.status(500).send(responseObject);
 				});
 		} catch (exception) {
 			super.InternalServerException(response, exception);
@@ -56,7 +56,7 @@ class RouterController extends BaseController
 	}
 
 	ping(request: express.Request, response: express.Response): void {
-		var routerRequestObject: any = <any>request.body;
+		var routerRequestObject: any = <any>request.body.data;
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -66,21 +66,31 @@ class RouterController extends BaseController
 					password: current.password,
 					keepalive: true
 				});
+				var responseObject: IResponseObject<any> = new ResponseObject<any>();
 				api
 					.connect()
 					.then((client: any) => {
 						const addressMenu = client
 							.menu('/ping')
-							// .where('address', routerRequestObject.host)
+							.where('address', routerRequestObject.address)
 							.then((result: any) => {
-								response.status(200).send('Ok');
+								responseObject.Data = result;
+								responseObject.Message = 'Device Pongged Successfully';
+								responseObject.Success = true;
+								response.status(200).send(responseObject);
 							})
 							.catch((err: any) => {
-								response.status(500).send('Error');
+								responseObject.Data = err;
+								responseObject.Message = 'Cannot Ping Device';
+								responseObject.Success = true;
+								response.status(500).send(responseObject);
 							});
 					})
 					.catch((err: any) => {
-						response.status(500).send('Error');
+						responseObject.Data = err;
+						responseObject.Message = 'An Error Occured';
+						responseObject.Success = false;
+						response.status(500).send(responseObject);
 					});
 			} else {
 				response.status(500).send('No Active Device Available');
@@ -93,7 +103,6 @@ class RouterController extends BaseController
 	getUsers(request: express.Request, response: express.Response): void {
 		try {
 			if (current) {
-				console.log(current);
 				const RouterOSClient = require('routeros-client').RouterOSClient;
 				const api = new RouterOSClient({
 					host: current.host,

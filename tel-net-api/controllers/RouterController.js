@@ -44,7 +44,7 @@ class RouterController extends BaseController_1.default {
                 responseObject.Data = err;
                 responseObject.Message = 'An Error Occured';
                 responseObject.Success = false;
-                response.status(400).send(responseObject);
+                response.status(500).send(responseObject);
             });
         }
         catch (exception) {
@@ -52,7 +52,7 @@ class RouterController extends BaseController_1.default {
         }
     }
     ping(request, response) {
-        var routerRequestObject = request.body;
+        var routerRequestObject = request.body.data;
         try {
             if (current) {
                 const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -62,20 +62,31 @@ class RouterController extends BaseController_1.default {
                     password: current.password,
                     keepalive: true
                 });
+                var responseObject = new ResponseObject_1.default();
                 api
                     .connect()
                     .then((client) => {
                     const addressMenu = client
                         .menu('/ping')
+                        .where('address', routerRequestObject.address)
                         .then((result) => {
-                        response.status(200).send('Ok');
+                        responseObject.Data = result;
+                        responseObject.Message = 'Device Pongged Successfully';
+                        responseObject.Success = true;
+                        response.status(200).send(responseObject);
                     })
                         .catch((err) => {
-                        response.status(500).send('Error');
+                        responseObject.Data = err;
+                        responseObject.Message = 'Cannot Ping Device';
+                        responseObject.Success = true;
+                        response.status(500).send(responseObject);
                     });
                 })
                     .catch((err) => {
-                    response.status(500).send('Error');
+                    responseObject.Data = err;
+                    responseObject.Message = 'An Error Occured';
+                    responseObject.Success = false;
+                    response.status(500).send(responseObject);
                 });
             }
             else {
@@ -89,7 +100,6 @@ class RouterController extends BaseController_1.default {
     getUsers(request, response) {
         try {
             if (current) {
-                console.log(current);
                 const RouterOSClient = require('routeros-client').RouterOSClient;
                 const api = new RouterOSClient({
                     host: current.host,

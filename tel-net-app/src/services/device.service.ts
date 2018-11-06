@@ -4,7 +4,15 @@ const apiUrl = 'http://localhost:8000/';
 
 class DeviceService {
 
-  public postData(url: string, data: any): any {
+  public connect(data: DeviceModel) {
+    return this.postData('router/connectToDevice', data);
+  }
+
+  public ping(data: any) {
+    return this.postData('router/ping', data);
+  }
+
+  private postData(url: string, data: any): any {
     return axios.post(apiUrl + url, {
       headers: {
         'Content-Type': 'application/json',
@@ -13,16 +21,12 @@ class DeviceService {
     });
   }
 
-  public getData(url: string, data: any): any {
+  private getData(url: string, data: any): any {
     return axios.get(apiUrl + url, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
-  }
-
-  public connect(data: DeviceModel) {
-    return this.postData('router/connectToDevice', data);
   }
 
 }
