@@ -15,7 +15,7 @@ class RouterController extends BaseController
 	}
 
 	connectToDevice(request: express.Request, response: express.Response): void {
-		var routerRequestObject: any = <any>request.body;
+		var routerRequestObject: any = <any>request.body.data;
 		try {
 			const RouterOSClient = require('routeros-client').RouterOSClient;
 			const api = new RouterOSClient({
@@ -28,15 +28,27 @@ class RouterController extends BaseController
 			current.host = routerRequestObject.host;
 			current.user = routerRequestObject.user;
 			current.password = routerRequestObject.password;
+			var responseObject: IResponseObject<any> = new ResponseObject<any>();
 			api
 				.connect()
 				.then((client: any) => {
 					if (client) {
-						response.status(200).send('Successfully Connected To Host');
+						responseObject.Data = current;
+						responseObject.Message = 'Device Connected Successfully';
+						responseObject.Success = true;
+						response.status(200).send(responseObject);
+					} else {
+						responseObject.Data = null;
+						responseObject.Message = 'Device Not Found';
+						responseObject.Success = false;
+						response.status(400).send(responseObject);
 					}
 				})
 				.catch((err: any) => {
-					response.status(500).send('Error Connecting To Host');
+					responseObject.Data = err;
+					responseObject.Message = 'An Error Occured';
+					responseObject.Success = false;
+					response.status(400).send(responseObject);
 				});
 		} catch (exception) {
 			super.InternalServerException(response, exception);
