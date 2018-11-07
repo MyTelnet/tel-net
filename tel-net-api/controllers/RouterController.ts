@@ -18,7 +18,7 @@ class RouterController extends BaseController
 	}
 
 	connectToDevice(request: express.Request, response: express.Response): void {
-		var routerRequestObject: any = <any>request.body;
+		var routerRequestObject: any = <any>request.body.data;
 		try {
 			const RouterOSClient = require('routeros-client').RouterOSClient;
 			const connection = new RouterOSClient({
@@ -70,7 +70,7 @@ class RouterController extends BaseController
 	}
 
 	ping(request: express.Request, response: express.Response): void {
-		var routerRequestObject: any = <any>request.body;
+		var routerRequestObject: any = <any>request.body.data;
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -176,7 +176,7 @@ class RouterController extends BaseController
 		request: express.Request,
 		response: express.Response
 	): void {
-		var routerRequestObject: any = <any>request.body;
+		var routerRequestObject: any = <any>request.body.data;
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -217,7 +217,7 @@ class RouterController extends BaseController
 	}
 
 	addUser(request: express.Request, response: express.Response): void {
-		var routerRequestObject: any = <any>request.body;
+		var routerRequestObject: any = <any>request.body.data;
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -254,7 +254,7 @@ class RouterController extends BaseController
 
 	getPingReport(request: express.Request, response: express.Response): void {
 		try {
-			var routerRequestObject: any = <any>request.body;
+			var routerRequestObject: any = <any>request.body.data;
 			var handler = new Handler();
 			var responseObject: IResponseObject<any[]> = new ResponseObject<any[]>();
 			handler.findMany((error, result) => {
