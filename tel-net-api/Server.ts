@@ -12,17 +12,17 @@ export class Server {
 
 	constructor() {
 		this.app = express();
-		this.config();
-		this.mongoDatabase();
+		this.configure();
+		this.initMongoDB();
 		this.routes();
 		this.startServer();
 	}
 
-	config() {
+	configure() {
 		this.app.use(Middleware.configuration);
 	}
 
-	mongoDatabase() {
+	initMongoDB() {
 		MongoDB(mongoose);
 	}
 
@@ -31,8 +31,15 @@ export class Server {
 	}
 
 	startServer() {
-		var server = http.createServer(this.app).listen(8000, () => {
-			console.log('Node app is running at http://localhost:8000');
+		let reportServerApp = express();
+		if (SeedData.Process) console.log('Database Seeded');
+		let port = parseInt(process.env.PORT, 10) || 8000;
+		this.app.set('port', port);
+		let server = this.app.listen(port, () => {
+			console.log('Node app is running at localhost:' + port);
+		});
+		let jsreport = require('jsreport')({
+			express: { app: reportServerApp, server: server }
 		});
 	}
 }

@@ -110,17 +110,7 @@ import { deviceService } from '../services/device.service';
     pingAddressRules: [(v: any) => !!v || 'Address is required']
   }),
   mounted: () => {
-             console.log(this);
-    deviceService
-      .getUsers()
-      .then((result: any) => {
-        if (result.data.Success) {
-          this.users = result.data.Data;
- 
-        } else {
-        }
-      })
-      .catch((error: any) => {});
+    this.getUsers();
   },
   props: {
     source: String
@@ -150,6 +140,16 @@ import { deviceService } from '../services/device.service';
       this.hasPingError = false;
       this.pingError = '';
       this.pingAddress = '';
+    },
+    getUsers() {
+      deviceService
+        .getUsers()
+        .then((result: any) => {
+          if (result.data.Success) {
+            this.users = result.data.Data;
+          }
+        })
+        .catch((error: any) => {});
     }
   }
 })

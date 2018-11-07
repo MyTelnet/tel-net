@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+	.brand-logo {
+		position: absolute;
+		color: #fff;
+		display: inline-block;
+		font-size: 2.1rem;
+		padding: 0;
+		white-space: nowrap;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		text-align: center;
+	}
+
+	nav {
+		background: #2196F3;
+	}
+</style>
+
+<div class="container">
+	<nav>
+		<div class="nav-wrapper">
+			<a href="#" class="brand-logo">Mikrotik Demo Report of Users</a>
+			<ul id="nav-mobile" class="right hide-on-med-and-down">
+			</ul>
+		</div>
+	</nav>
+	<div style="padding:16px;">
+		<table class="striped">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Group</th>
+					<th>Last Logged In</th>
+					<th>De-Activated</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{for items}}
+				<tr>
+					<td> {{:name}}</td>
+					<td> {{:group}}</td>
+					<td> {{:lastLoggedIn}}</td>
+					<td> {{:disabled}}</td>
+				</tr>
+				{{/for}}
+			</tbody>
+		</table>
+	</div>

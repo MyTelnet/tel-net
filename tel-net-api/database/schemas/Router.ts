@@ -4,22 +4,9 @@ import IRouter from "../interfaces/IRouter";
 
 class Router {
 	static get Schema() {
-		var activitySchema = new Schema({
-			RouterId: String,
-			ExerciseId: String,
-			RouterName: String,
-			RouterDescription: String,
-			RouterTypeId: String,
-			RouterTypeName: String,
-			RouterTypeDescription: String,
-			TenantId: String,
-			IsDeleted: Boolean,
-			CreatedDateTime: Date,
-			LastUpdatedDateTime: Date,
-			CreatedBy: String,
-			LastUpdatedBy: String
+		var routerSchema = new Schema({
 		});
-		return activitySchema;
+		return routerSchema;
 	}
 }
 var schema = mongoose.model<IRouter>("Router", Router.Schema, "Router");

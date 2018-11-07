@@ -6,26 +6,35 @@ const mongoose = require("mongoose");
 const MiddlewareBase_1 = require("./middleware/MiddlewareBase");
 const MongoDatabase_1 = require("./database/MongoDatabase");
 const Base_1 = require("./routes/Base");
+const SeedData_1 = require("./database/SeedData");
 class Server {
     constructor() {
         this.app = express();
-        this.config();
-        this.mongoDatabase();
+        this.configure();
+        this.initMongoDB();
         this.routes();
         this.startServer();
     }
-    config() {
+    configure() {
         this.app.use(MiddlewareBase_1.default.configuration);
     }
-    mongoDatabase() {
+    initMongoDB() {
         MongoDatabase_1.default(mongoose);
     }
     routes() {
         this.app.use(new Base_1.default().Routes);
     }
     startServer() {
-        var server = http.createServer(this.app).listen(8000, () => {
-            console.log('Node app is running at http://localhost:8000');
+        let reportServerApp = express();
+        if (SeedData_1.default.Process)
+            console.log('Database Seeded');
+        let port = parseInt(process.env.PORT, 10) || 8000;
+        this.app.set('port', port);
+        let server = this.app.listen(port, () => {
+            console.log('Node app is running at localhost:' + port);
+        });
+        let jsreport = require('jsreport')({
+            express: { app: reportServerApp, server: server }
         });
     }
 }

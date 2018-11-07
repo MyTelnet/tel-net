@@ -7,7 +7,10 @@ import Handler from './../handlers/router/Router';
 import Router from '../models/router/Router';
 import IResponseObject from '../database/models/IResponseObject';
 import ResponseObject from '../database/models/ResponseObject';
+var jsreport = require('jsreport-core')();
+var fs = require('fs');
 var current: Router;
+
 class RouterController extends BaseController
 	implements IBaseController<Handler> {
 	RouterController() {
@@ -186,8 +189,7 @@ class RouterController extends BaseController
 							.then((client2: any) => {
 								return api.close();
 							})
-							.then(() => {
-							})
+							.then(() => {})
 							.catch((err: any) => {
 								response.status(500).send('Error');
 							});
@@ -256,6 +258,91 @@ class RouterController extends BaseController
 					response.status(200).send(responseObject);
 				}
 			});
+		} catch (exception) {
+			super.InternalServerException(response, exception);
+		}
+	}
+
+	getUserReport(request: express.Request, response: express.Response): void {
+		try {
+			if (current) {
+				const RouterOSClient = require('routeros-client').RouterOSClient;
+				const api = new RouterOSClient({
+					host: current.host,
+					user: current.user,
+					password: current.password,
+					keepalive: true
+				});
+				var responseObject: IResponseObject<any> = new ResponseObject<any>();
+				var template = fs.readFileSync('./reports/pingReport.html', 'utf8');
+				var reportingData = new Array();
+				api
+					.connect()
+					.then((client: any) => {
+						const addressMenu = client.menu('/user print');
+						addressMenu
+							.get()
+							.then((result: any) => {
+								let users: any[] = [];
+								result.forEach((element: any) => {
+									let user = {
+										name: element.name,
+										group: element.name,
+										lastLoggedIn: element.lastLoggedIn,
+										disabled: element.disabled
+									};
+									reportingData.push(user);
+								});
+								console.log(reportingData);
+								var reportDataModel = { items: reportingData };
+
+								jsreport
+									.init()
+									.then(function() {
+										jsreport
+											.render({
+												template: {
+													content: template,
+													engine: 'jsrender',
+													recipe: 'phantom-pdf'
+												},
+												data: reportDataModel
+											})
+											.then(function(out: any) {
+												response.writeHead(200, {
+													'Content-Type': 'application/pdf',
+													'Content-disposition': 'attachment;filename=device_users.pdf'
+												});
+												out.stream.pipe(response);
+											})
+											.catch(function(e: any) {
+												console.log(e);
+												response.end(e.message);
+											});
+									})
+									.catch(function(e: string) {
+										console.error(e);
+									});
+							})
+							.catch((err: any) => {
+								responseObject.Data = err;
+								responseObject.Message = 'Error Retrieving Users';
+								responseObject.Success = false;
+								response.status(500).send(responseObject);
+							});
+					})
+					.catch((err: any) => {
+						responseObject.Data = err;
+						responseObject.Message = 'Error Retrieving Users';
+						responseObject.Success = false;
+						response.status(500).send(responseObject);
+					});
+			} else {
+				responseObject.Data = null;
+				responseObject.Message = 'No Active Device Available';
+				responseObject.Success = false;
+				response.status(500).send(responseObject);
+			}
 		} catch (exception) {
 			super.InternalServerException(response, exception);
 		}

@@ -13,6 +13,8 @@ class Router {
         router.post('/connectToDevice', controller.connectToDevice);
         router.get('/getUsers', controller.getUsers);
         router.post('/changeUserPassword', controller.changeUserPassword);
+        router.post('/addUser', controller.addUser);
+        router.get('/getUserReport', controller.getUserReport);
         console.log('Router Routes Created!');
         return router;
     }

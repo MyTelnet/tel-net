@@ -4,6 +4,8 @@ const BaseController_1 = require("./BaseController");
 const Router_1 = require("./../handlers/router/Router");
 const Router_2 = require("../models/router/Router");
 const ResponseObject_1 = require("../database/models/ResponseObject");
+var jsreport = require('jsreport-core')();
+var fs = require('fs');
 var current;
 class RouterController extends BaseController_1.default {
     RouterController() {
@@ -252,6 +254,91 @@ class RouterController extends BaseController_1.default {
                     response.status(200).send(responseObject);
                 }
             });
+        }
+        catch (exception) {
+            super.InternalServerException(response, exception);
+        }
+    }
+    getUserReport(request, response) {
+        try {
+            if (current) {
+                const RouterOSClient = require('routeros-client').RouterOSClient;
+                const api = new RouterOSClient({
+                    host: current.host,
+                    user: current.user,
+                    password: current.password,
+                    keepalive: true
+                });
+                var responseObject = new ResponseObject_1.default();
+                var template = fs.readFileSync('./reports/pingReport.html', 'utf8');
+                var reportingData = new Array();
+                api
+                    .connect()
+                    .then((client) => {
+                    const addressMenu = client.menu('/user print');
+                    addressMenu
+                        .get()
+                        .then((result) => {
+                        let users = [];
+                        result.forEach((element) => {
+                            let user = {
+                                name: element.name,
+                                group: element.name,
+                                lastLoggedIn: element.lastLoggedIn,
+                                disabled: element.disabled
+                            };
+                            reportingData.push(user);
+                        });
+                        console.log(reportingData);
+                        var reportDataModel = { items: reportingData };
+                        jsreport
+                            .init()
+                            .then(function () {
+                            jsreport
+                                .render({
+                                template: {
+                                    content: template,
+                                    engine: 'jsrender',
+                                    recipe: 'phantom-pdf'
+                                },
+                                data: reportDataModel
+                            })
+                                .then(function (out) {
+                                response.writeHead(200, {
+                                    'Content-Type': 'application/pdf',
+                                    'Content-disposition': 'attachment;filename=device_users.pdf'
+                                });
+                                out.stream.pipe(response);
+                            })
+                                .catch(function (e) {
+                                console.log(e);
+                                response.end(e.message);
+                            });
+                        })
+                            .catch(function (e) {
+                            console.error(e);
+                        });
+                    })
+                        .catch((err) => {
+                        responseObject.Data = err;
+                        responseObject.Message = 'Error Retrieving Users';
+                        responseObject.Success = false;
+                        response.status(500).send(responseObject);
+                    });
+                })
+                    .catch((err) => {
+                    responseObject.Data = err;
+                    responseObject.Message = 'Error Retrieving Users';
+                    responseObject.Success = false;
+                    response.status(500).send(responseObject);
+                });
+            }
+            else {
+                responseObject.Data = null;
+                responseObject.Message = 'No Active Device Available';
+                responseObject.Success = false;
+                response.status(500).send(responseObject);
+            }
         }
         catch (exception) {
             super.InternalServerException(response, exception);
