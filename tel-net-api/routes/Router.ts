@@ -14,7 +14,7 @@ class Router {
 		router.post('/ping', controller.ping);
 		router.post('/connectToDevice', controller.connectToDevice);
 		router.get('/getUsers', controller.getUsers);
-		// router.post('/changePassword', controller.changePassword);
+		 router.post('/changeUserPassword', controller.changeUserPassword);
 		// router.post('/addUser', controller.addUser);
 		console.log('Router Routes Created!');
 		return router;

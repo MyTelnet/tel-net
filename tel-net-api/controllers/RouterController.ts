@@ -56,7 +56,7 @@ class RouterController extends BaseController
 	}
 
 	ping(request: express.Request, response: express.Response): void {
-		var routerRequestObject: any = <any>request.body.data;
+		var routerRequestObject: any = <any>request.body;
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -70,12 +70,13 @@ class RouterController extends BaseController
 				api
 					.connect()
 					.then((client: any) => {
-						const addressMenu = client
-							.menu('/ping')
+						const addressMenu = client.menu('/ping');
+						addressMenu
 							.where('address', routerRequestObject.address)
+							.get()
 							.then((result: any) => {
 								responseObject.Data = result;
-								responseObject.Message = 'Device Pongged Successfully';
+								responseObject.Message = 'Device Ponged Successfully';
 								responseObject.Success = true;
 								response.status(200).send(responseObject);
 							})
@@ -161,7 +162,7 @@ class RouterController extends BaseController
 		request: express.Request,
 		response: express.Response
 	): void {
-		var routerRequestObject: any = <any>request.body.data;
+		var routerRequestObject: any = <any>request.body;
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -176,7 +177,7 @@ class RouterController extends BaseController
 						api
 							.setOptions({
 								user: routerRequestObject.user,
-								password: routerRequestObject.newPassword
+								password: routerRequestObject.password
 							})
 							.close()
 							.then(() => {
@@ -185,7 +186,8 @@ class RouterController extends BaseController
 							.then((client2: any) => {
 								return api.close();
 							})
-							.then(() => {})
+							.then(() => {
+							})
 							.catch((err: any) => {
 								response.status(500).send('Error');
 							});

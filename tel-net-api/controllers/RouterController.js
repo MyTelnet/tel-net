@@ -52,7 +52,7 @@ class RouterController extends BaseController_1.default {
         }
     }
     ping(request, response) {
-        var routerRequestObject = request.body.data;
+        var routerRequestObject = request.body;
         try {
             if (current) {
                 const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -66,12 +66,13 @@ class RouterController extends BaseController_1.default {
                 api
                     .connect()
                     .then((client) => {
-                    const addressMenu = client
-                        .menu('/ping')
+                    const addressMenu = client.menu('/ping');
+                    addressMenu
                         .where('address', routerRequestObject.address)
+                        .get()
                         .then((result) => {
                         responseObject.Data = result;
-                        responseObject.Message = 'Device Pongged Successfully';
+                        responseObject.Message = 'Device Ponged Successfully';
                         responseObject.Success = true;
                         response.status(200).send(responseObject);
                     })
@@ -156,7 +157,7 @@ class RouterController extends BaseController_1.default {
         }
     }
     changeUserPassword(request, response) {
-        var routerRequestObject = request.body.data;
+        var routerRequestObject = request.body;
         try {
             if (current) {
                 const RouterOSClient = require('routeros-client').RouterOSClient;
@@ -171,7 +172,7 @@ class RouterController extends BaseController_1.default {
                     api
                         .setOptions({
                         user: routerRequestObject.user,
-                        password: routerRequestObject.newPassword
+                        password: routerRequestObject.password
                     })
                         .close()
                         .then(() => {

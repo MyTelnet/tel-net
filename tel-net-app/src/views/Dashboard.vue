@@ -64,9 +64,12 @@
               <div class="card-header-block">
                 <h3 class="headline mb-0 text-xs-center">Current Users</h3>
               </div>
-              <li v-if="!users" v-for="value in users" v-bind:key="value">
+              <div v-if="!users">
+              <li  v-for="value in users" v-bind:key="value">
     {{ value }}
   </li>
+              </div>
+
             </v-card>
           </v-flex>
           <v-flex>
@@ -97,27 +100,28 @@ import { Component, Emit, Prop, Watch, Vue } from 'vue-property-decorator';
 import { timer, Observable, Subscription } from 'rxjs';
 import { deviceService } from '../services/device.service';
 @Component({
-  mounted: () => {
-    deviceService
-      .getUsers()
-      .then((result: any) => {
-        if (result.data.Success) {
-          this.users = result.data.Data;
-          alert(result.data.Data)
-        } else {
-        }
-      })
-      .catch((error: any) => {});
-  },
   data: () => ({
     drawer: true,
     validPing: true,
     pingAddress: '',
     hasPingError: false,
     pingError: '',
-    users: null,
+    users: [],
     pingAddressRules: [(v: any) => !!v || 'Address is required']
   }),
+  mounted: () => {
+             console.log(this);
+    deviceService
+      .getUsers()
+      .then((result: any) => {
+        if (result.data.Success) {
+          this.users = result.data.Data;
+ 
+        } else {
+        }
+      })
+      .catch((error: any) => {});
+  },
   props: {
     source: String
   },
@@ -146,8 +150,7 @@ import { deviceService } from '../services/device.service';
       this.hasPingError = false;
       this.pingError = '';
       this.pingAddress = '';
-    },
-
+    }
   }
 })
 export default class Dashboard extends Vue {}
