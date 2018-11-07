@@ -12,7 +12,7 @@ class RouterController extends BaseController_1.default {
         current = new Router_2.default();
     }
     connectToDevice(request, response) {
-        var routerRequestObject = request.body.data;
+        var routerRequestObject = request.body;
         try {
             const RouterOSClient = require('routeros-client').RouterOSClient;
             const connection = new RouterOSClient({
@@ -81,9 +81,7 @@ class RouterController extends BaseController_1.default {
                     .then((client) => {
                     const addressMenu = client.menu('/ping');
                     addressMenu
-                        .add({
-                        address: routerRequestObject.address
-                    })
+                        .whereRaw(['?address=192.168.1.1']).get()
                         .then((result) => {
                         responseObject.Data = result;
                         responseObject.Message = 'Device Ponged Successfully';
@@ -91,6 +89,7 @@ class RouterController extends BaseController_1.default {
                         response.status(200).send(responseObject);
                     })
                         .catch((err) => {
+                        console.log(err);
                         responseObject.Data = err;
                         responseObject.Message = 'Cannot Ping Device';
                         responseObject.Success = true;
