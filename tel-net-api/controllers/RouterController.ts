@@ -21,7 +21,7 @@ class RouterController extends BaseController
 		var routerRequestObject: any = <any>request.body.data;
 		try {
 			const RouterOSClient = require('routeros-client').RouterOSClient;
-			const api = new RouterOSClient({
+			const connection = new RouterOSClient({
 				host: routerRequestObject.host,
 				user: routerRequestObject.user,
 				password: routerRequestObject.password,
@@ -32,19 +32,30 @@ class RouterController extends BaseController
 			current.user = routerRequestObject.user;
 			current.password = routerRequestObject.password;
 			var responseObject: IResponseObject<any> = new ResponseObject<any>();
-			api
+			connection
 				.connect()
 				.then((client: any) => {
 					if (client) {
-						responseObject.Data = current;
-						responseObject.Message = 'Device Connected Successfully';
-						responseObject.Success = true;
-						response.status(200).send(responseObject);
+						const addressMenu = client.menu('/system resource print');
+						addressMenu
+							.get()
+							.then((device: any) => {
+								responseObject.Data = device;
+								responseObject.Message = 'Device Successfully Connected';
+								responseObject.Success = true;
+								response.status(200).send(responseObject);
+							})
+							.catch((err: any) => {
+								responseObject.Data = null;
+								responseObject.Message = 'Device Not Found';
+								responseObject.Success = false;
+								response.status(500).send(responseObject);
+							});
 					} else {
 						responseObject.Data = null;
 						responseObject.Message = 'Device Not Found';
 						responseObject.Success = false;
-						response.status(400).send(responseObject);
+						response.status(500).send(responseObject);
 					}
 				})
 				.catch((err: any) => {
@@ -63,20 +74,21 @@ class RouterController extends BaseController
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
-				const api = new RouterOSClient({
+				const connection = new RouterOSClient({
 					host: current.host,
 					user: current.user,
 					password: current.password,
 					keepalive: true
 				});
 				var responseObject: IResponseObject<any> = new ResponseObject<any>();
-				api
+				connection
 					.connect()
 					.then((client: any) => {
 						const addressMenu = client.menu('/ping');
 						addressMenu
-							.where('address', routerRequestObject.address)
-							.get()
+							.add({
+								address: routerRequestObject.address
+							})
 							.then((result: any) => {
 								responseObject.Data = result;
 								responseObject.Message = 'Device Ponged Successfully';
@@ -108,14 +120,14 @@ class RouterController extends BaseController
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
-				const api = new RouterOSClient({
+				const connection = new RouterOSClient({
 					host: current.host,
 					user: current.user,
 					password: current.password,
 					keepalive: true
 				});
 				var responseObject: IResponseObject<any> = new ResponseObject<any>();
-				api
+				connection
 					.connect()
 					.then((client: any) => {
 						const addressMenu = client.menu('/user print');
@@ -169,25 +181,25 @@ class RouterController extends BaseController
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
-				const api = new RouterOSClient({
+				const connection = new RouterOSClient({
 					host: current.host,
 					user: current.user,
 					password: current.password
 				});
-				api
+				connection
 					.connect()
 					.then((client1: any) => {
-						api
+						connection
 							.setOptions({
 								user: routerRequestObject.user,
 								password: routerRequestObject.password
 							})
 							.close()
 							.then(() => {
-								return api.connect();
+								return connection.connect();
 							})
 							.then((client2: any) => {
-								return api.close();
+								return connection.close();
 							})
 							.then(() => {})
 							.catch((err: any) => {
@@ -210,12 +222,12 @@ class RouterController extends BaseController
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
-				const api = new RouterOSClient({
+				const connection = new RouterOSClient({
 					host: current.host,
 					user: current.user,
 					password: current.password
 				});
-				api
+				connection
 					.connect()
 					.then((client: any) => {
 						const menu = client.menu('/user');
@@ -267,16 +279,16 @@ class RouterController extends BaseController
 		try {
 			if (current) {
 				const RouterOSClient = require('routeros-client').RouterOSClient;
-				const api = new RouterOSClient({
+				const connection = new RouterOSClient({
 					host: current.host,
 					user: current.user,
 					password: current.password,
 					keepalive: true
 				});
 				var responseObject: IResponseObject<any> = new ResponseObject<any>();
-				var template = fs.readFileSync('./reports/pingReport.html', 'utf8');
+				var template = fs.readFileSync('./reports/users.html', 'utf8');
 				var reportingData = new Array();
-				api
+				connection
 					.connect()
 					.then((client: any) => {
 						const addressMenu = client.menu('/user print');
@@ -293,9 +305,7 @@ class RouterController extends BaseController
 									};
 									reportingData.push(user);
 								});
-								console.log(reportingData);
 								var reportDataModel = { items: reportingData };
-
 								jsreport
 									.init()
 									.then(function() {
@@ -311,7 +321,8 @@ class RouterController extends BaseController
 											.then(function(out: any) {
 												response.writeHead(200, {
 													'Content-Type': 'application/pdf',
-													'Content-disposition': 'attachment;filename=device_users.pdf'
+													'Content-disposition':
+														'attachment;filename=device_users.pdf'
 												});
 												out.stream.pipe(response);
 											})

@@ -15,7 +15,7 @@ class RouterController extends BaseController_1.default {
         var routerRequestObject = request.body.data;
         try {
             const RouterOSClient = require('routeros-client').RouterOSClient;
-            const api = new RouterOSClient({
+            const connection = new RouterOSClient({
                 host: routerRequestObject.host,
                 user: routerRequestObject.user,
                 password: routerRequestObject.password,
@@ -26,20 +26,31 @@ class RouterController extends BaseController_1.default {
             current.user = routerRequestObject.user;
             current.password = routerRequestObject.password;
             var responseObject = new ResponseObject_1.default();
-            api
+            connection
                 .connect()
                 .then((client) => {
                 if (client) {
-                    responseObject.Data = current;
-                    responseObject.Message = 'Device Connected Successfully';
-                    responseObject.Success = true;
-                    response.status(200).send(responseObject);
+                    const addressMenu = client.menu('/system resource print');
+                    addressMenu
+                        .get()
+                        .then((device) => {
+                        responseObject.Data = device;
+                        responseObject.Message = 'Device Successfully Connected';
+                        responseObject.Success = true;
+                        response.status(200).send(responseObject);
+                    })
+                        .catch((err) => {
+                        responseObject.Data = null;
+                        responseObject.Message = 'Device Not Found';
+                        responseObject.Success = false;
+                        response.status(500).send(responseObject);
+                    });
                 }
                 else {
                     responseObject.Data = null;
                     responseObject.Message = 'Device Not Found';
                     responseObject.Success = false;
-                    response.status(400).send(responseObject);
+                    response.status(500).send(responseObject);
                 }
             })
                 .catch((err) => {
@@ -58,20 +69,21 @@ class RouterController extends BaseController_1.default {
         try {
             if (current) {
                 const RouterOSClient = require('routeros-client').RouterOSClient;
-                const api = new RouterOSClient({
+                const connection = new RouterOSClient({
                     host: current.host,
                     user: current.user,
                     password: current.password,
                     keepalive: true
                 });
                 var responseObject = new ResponseObject_1.default();
-                api
+                connection
                     .connect()
                     .then((client) => {
                     const addressMenu = client.menu('/ping');
                     addressMenu
-                        .where('address', routerRequestObject.address)
-                        .get()
+                        .add({
+                        address: routerRequestObject.address
+                    })
                         .then((result) => {
                         responseObject.Data = result;
                         responseObject.Message = 'Device Ponged Successfully';
@@ -104,14 +116,14 @@ class RouterController extends BaseController_1.default {
         try {
             if (current) {
                 const RouterOSClient = require('routeros-client').RouterOSClient;
-                const api = new RouterOSClient({
+                const connection = new RouterOSClient({
                     host: current.host,
                     user: current.user,
                     password: current.password,
                     keepalive: true
                 });
                 var responseObject = new ResponseObject_1.default();
-                api
+                connection
                     .connect()
                     .then((client) => {
                     const addressMenu = client.menu('/user print');
@@ -163,25 +175,25 @@ class RouterController extends BaseController_1.default {
         try {
             if (current) {
                 const RouterOSClient = require('routeros-client').RouterOSClient;
-                const api = new RouterOSClient({
+                const connection = new RouterOSClient({
                     host: current.host,
                     user: current.user,
                     password: current.password
                 });
-                api
+                connection
                     .connect()
                     .then((client1) => {
-                    api
+                    connection
                         .setOptions({
                         user: routerRequestObject.user,
                         password: routerRequestObject.password
                     })
                         .close()
                         .then(() => {
-                        return api.connect();
+                        return connection.connect();
                     })
                         .then((client2) => {
-                        return api.close();
+                        return connection.close();
                     })
                         .then(() => { })
                         .catch((err) => {
@@ -205,12 +217,12 @@ class RouterController extends BaseController_1.default {
         try {
             if (current) {
                 const RouterOSClient = require('routeros-client').RouterOSClient;
-                const api = new RouterOSClient({
+                const connection = new RouterOSClient({
                     host: current.host,
                     user: current.user,
                     password: current.password
                 });
-                api
+                connection
                     .connect()
                     .then((client) => {
                     const menu = client.menu('/user');
@@ -263,16 +275,16 @@ class RouterController extends BaseController_1.default {
         try {
             if (current) {
                 const RouterOSClient = require('routeros-client').RouterOSClient;
-                const api = new RouterOSClient({
+                const connection = new RouterOSClient({
                     host: current.host,
                     user: current.user,
                     password: current.password,
                     keepalive: true
                 });
                 var responseObject = new ResponseObject_1.default();
-                var template = fs.readFileSync('./reports/pingReport.html', 'utf8');
+                var template = fs.readFileSync('./reports/users.html', 'utf8');
                 var reportingData = new Array();
-                api
+                connection
                     .connect()
                     .then((client) => {
                     const addressMenu = client.menu('/user print');
@@ -289,7 +301,6 @@ class RouterController extends BaseController_1.default {
                             };
                             reportingData.push(user);
                         });
-                        console.log(reportingData);
                         var reportDataModel = { items: reportingData };
                         jsreport
                             .init()
